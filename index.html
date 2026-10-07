@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>多益閱讀</title>
+<title>多益閱讀修練場</title>
 <style>
 /* 俐方體 11 號（Cubic 11）：開源的繁體中文像素字體 */
 @font-face {
@@ -47,12 +47,12 @@ body::after {
   background: linear-gradient(var(--grass) 0 8px, var(--dirt) 8px);
   border-top: 3px solid var(--grass-dark);
 }
-/* 「閱讀字體」模式：長文章和解析改回一般字體 */
-body.readable main {
+/* 題目區（文章、題目、選項、解析）用一般字體，比較好讀 */
+main {
   font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
 }
 /* 標題列、按鈕、LEVEL UP / MISS 這些裝飾維持像素字 */
-body.readable main .win-title, body.readable main .go, body.readable main .verdict .big { font-family: "Cubic11", "PingFang TC", sans-serif; }
+main .win-title, main .go, main .verdict .big { font-family: "Cubic11", "PingFang TC", sans-serif; }
 button { font: inherit; color: inherit; }
 
 /* 楓之谷視窗：木頭色外框、奶油色內容 */
@@ -230,13 +230,12 @@ th { background: var(--panel-2); font-weight: normal; }
 <header>
   <div class="bar">
     <button class="menu-btn" id="menuBtn" title="開合任務清單">☰</button>
-    <div class="logo"><span id="logoLeaf"></span><div><h1>多益閱讀</h1><small id="subtitle"></small></div></div>
+    <div class="logo"><span id="logoLeaf"></span><div><h1>多益閱讀修練場</h1><small id="subtitle"></small></div></div>
     <div class="status">
       <span class="lv" id="lv">Lv.1</span>
       <div class="gauge" title="答對率"><b>HP</b><div class="track"><div class="fill hp" id="hpFill"></div><span id="hpText"></span></div></div>
       <div class="gauge" title="這份考卷的作答進度"><b>EXP</b><div class="track"><div class="fill exp" id="expFill"></div><span id="expText"></span></div></div>
     </div>
-    <button class="tool" id="fontBtn" title="切換長文章的字體">字體</button>
     <button class="tool" id="resetAll" title="清除這份考卷的作答紀錄">重來</button>
   </div>
 </header>
@@ -477,7 +476,7 @@ function go(id, part) {
   if (id !== examId) {
     examId = id; exam = getExam(id); state = load(PREFIX + id) || {};
     store(PREFIX + "current", id);
-    document.title = exam.title + "・多益閱讀";
+    document.title = exam.title + "・多益閱讀修練場";
   }
   if (!part) { const saved = String(load(PREFIX + id + "-tab")); part = exam.partKeys.includes(saved) ? saved : exam.partKeys[0]; }
   curPart = part; store(PREFIX + id + "-tab", part);
@@ -609,12 +608,6 @@ $("#resetAll").onclick = () => {
   if (!confirm(`確定要清除 ${exam.title} 的所有作答紀錄？`)) return;
   state = {}; save(); renderMain();
 };
-const applyFont = () => {
-  const readable = load(PREFIX + "readable") === true;
-  document.body.classList.toggle("readable", readable);
-  $("#fontBtn").textContent = readable ? "字體：一般" : "字體：像素";
-};
-$("#fontBtn").onclick = () => { store(PREFIX + "readable", !(load(PREFIX + "readable") === true)); applyFont(); };
 
 // 側邊欄開合：寬螢幕記住上次的狀態；窄螢幕是抽屜，預設收起
 const isNarrow = () => matchMedia("(max-width: 899px)").matches;
@@ -635,7 +628,6 @@ const measure = () => {
 addEventListener("resize", measure);
 
 $("#logoLeaf").innerHTML = leafSVG();
-applyFont();
 go(EXAMS.includes(load(PREFIX + "current")) ? load(PREFIX + "current") : EXAMS[0]);
 measure();
 </script>

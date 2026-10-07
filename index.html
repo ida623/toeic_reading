@@ -99,7 +99,7 @@ svg.leaf { width: 32px; height: 32px; shape-rendering: crispEdges; flex: none; }
 
 /* 側邊欄：任務清單（考卷 → Part） */
 .layout { max-width: 1440px; margin: 0 auto; padding: 22px 16px 100px; display: flex; gap: 22px; align-items: flex-start; position: relative; z-index: 2; }
-main { flex: 1; min-width: 0; overflow-wrap: anywhere; container-type: inline-size; }
+main { overflow-anchor: none; flex: 1; min-width: 0; overflow-wrap: anywhere; container-type: inline-size; }
 .side { width: 260px; flex: none; position: sticky; top: calc(var(--hh, 0px) + 22px);
   max-height: calc(100vh - var(--hh, 0px) - 60px); display: flex; flex-direction: column; }
 .side .win-title { justify-content: space-between; }
@@ -567,9 +567,23 @@ function setHTML(set) {
     ${reveal}</div></section>`;
 }
 
+// 重畫一個題組（送出、重做時用）：先記住題組在畫面上的位置，畫完捲回原處，避免手機上畫面亂跳
 function renderSet(id) {
+  const top = document.getElementById(id).getBoundingClientRect().top;
   document.getElementById(id).outerHTML = setHTML(exam.sets.find(s => s.id === id));
+  scrollBy(0, document.getElementById(id).getBoundingClientRect().top - top);
   renderScore();
+}
+
+// 點選項：只更新這一題的選取狀態和送出按鈕，不重畫整個題組
+function pickOption(setId, num, key) {
+  st(setId).picks[num] = key; save();
+  const sec = document.getElementById(setId);
+  sec.querySelectorAll(`.opt[data-q="${num}"]`).forEach(b => b.classList.toggle("sel", b.dataset.k === key));
+  const html = setHTML(exam.sets.find(s => s.id === setId));
+  const fresh = document.createElement("div");
+  fresh.innerHTML = html;
+  sec.querySelector(".actions").replaceWith(fresh.querySelector(".actions"));
 }
 
 // 每個 Part 最下面的「下一步」按鈕：下一個 Part，或下一份考卷
@@ -596,7 +610,7 @@ $("#exams").addEventListener("click", e => {
 });
 $("#main").addEventListener("click", e => {
   const opt = e.target.closest(".opt");
-  if (opt && !opt.disabled) { st(opt.dataset.set).picks[opt.dataset.q] = opt.dataset.k; save(); renderSet(opt.dataset.set); return; }
+  if (opt && !opt.disabled) { pickOption(opt.dataset.set, opt.dataset.q, opt.dataset.k); return; }
   const sub = e.target.closest("[data-submit]");
   if (sub && !sub.disabled) { st(sub.dataset.submit).done = true; save(); renderSet(sub.dataset.submit); return; }
   const nx = e.target.closest("[data-go]");

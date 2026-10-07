@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>多益閱讀修練場</title>
+<title>多益閱讀</title>
 <style>
 /* 俐方體 11 號（Cubic 11）：開源的繁體中文像素字體 */
 @font-face {
@@ -230,7 +230,7 @@ th { background: var(--panel-2); font-weight: normal; }
 <header>
   <div class="bar">
     <button class="menu-btn" id="menuBtn" title="開合任務清單">☰</button>
-    <div class="logo"><span id="logoLeaf"></span><div><h1>多益閱讀修練場</h1><small id="subtitle"></small></div></div>
+    <div class="logo"><span id="logoLeaf"></span><div><h1>多益閱讀</h1><small id="subtitle"></small></div></div>
     <div class="status">
       <span class="lv" id="lv">Lv.1</span>
       <div class="gauge" title="答對率"><b>HP</b><div class="track"><div class="fill hp" id="hpFill"></div><span id="hpText"></span></div></div>
@@ -476,7 +476,7 @@ function go(id, part) {
   if (id !== examId) {
     examId = id; exam = getExam(id); state = load(PREFIX + id) || {};
     store(PREFIX + "current", id);
-    document.title = exam.title + "・多益閱讀修練場";
+    document.title = "多益閱讀";
   }
   if (!part) { const saved = String(load(PREFIX + id + "-tab")); part = exam.partKeys.includes(saved) ? saved : exam.partKeys[0]; }
   curPart = part; store(PREFIX + id + "-tab", part);
